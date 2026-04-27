@@ -5,7 +5,11 @@ A self-serve map for any school or class to drop pins of where everyone's headed
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmbcrosiersamuel%2Fclass-map&env=VITE_MAPBOX_TOKEN,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY&envDescription=See%20the%20README%20for%20how%20to%20get%20these&envLink=https%3A%2F%2Fgithub.com%2Fmbcrosiersamuel%2Fclass-map%23quick-start-15-minutes&project-name=class-map&repository-name=class-map)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/mbcrosiersamuel/class-map)
 
-![screenshot placeholder](./public/og-image.svg)
+![Map tab](./docs/screenshots/map.png)
+
+| Submit | Stats |
+|---|---|
+| ![Submit tab](./docs/screenshots/submit.png) | ![Stats tab](./docs/screenshots/stats.png) |
 
 **Features**
 - 🌍 Interactive globe with pins clustered by city
