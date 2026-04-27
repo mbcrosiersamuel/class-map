@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Theme tokens. Override --color-primary and --color-surface at runtime in
+ * src/main.tsx using the values from src/config.ts. */
+@theme {
+  --color-primary: #A51C30;
+  --color-surface: #FAF9F6;
+  --font-playfair: 'Playfair Display', serif;
+  --font-sans: 'DM Sans', sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Push Mapbox zoom controls above the mobile bottom tab bar */
+@media (max-width: 767px) {
+  .mapboxgl-ctrl-bottom-right {
+    bottom: 70px !important;
+  }
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--color-surface);
+  color: #111827;
+}
