@@ -2,20 +2,29 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Person } from '../types';
 
-export function usePeople() {
+export interface UsePeopleResult {
+  people: Person[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+export function usePeople(): UsePeopleResult {
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPeople = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error: fetchError } = await supabase
       .from('people')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching people:', error);
+    if (fetchError) {
+      setError(fetchError.message || 'Could not load classmates.');
     } else {
       setPeople((data as Person[]) ?? []);
+      setError(null);
     }
     setLoading(false);
   }, []);
@@ -23,19 +32,21 @@ export function usePeople() {
   useEffect(() => {
     let cancelled = false;
 
-    // Initial fetch — guarded against unmount with `cancelled`.
     (async () => {
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('people')
         .select('*')
         .order('created_at', { ascending: false });
       if (cancelled) return;
-      if (error) console.error('Error fetching people:', error);
-      else setPeople((data as Person[]) ?? []);
+      if (fetchError) {
+        setError(fetchError.message || 'Could not load classmates.');
+      } else {
+        setPeople((data as Person[]) ?? []);
+        setError(null);
+      }
       setLoading(false);
     })();
 
-    // Realtime: refetch whenever any row changes.
     const channel = supabase
       .channel('people-changes')
       .on(
@@ -53,5 +64,5 @@ export function usePeople() {
     };
   }, [fetchPeople]);
 
-  return { people, loading, refetch: fetchPeople };
+  return { people, loading, error, refetch: fetchPeople };
 }

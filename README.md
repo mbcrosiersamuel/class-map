@@ -29,6 +29,18 @@ A self-serve map for any school or class to drop pins of where everyone's headed
 
 This is intentional and works fine for a small trusted class group, but **do not deploy this publicly without thinking about it**. If you want real auth, you'll need to wire up Supabase Auth and adjust the RLS policies in `supabase/schema.sql` — see [Adding auth](#adding-auth) below for pointers.
 
+### Security checklist before going live
+
+The defaults are reasonable for a small trusted group, but harden these before sharing the URL widely:
+
+- [ ] **Restrict your Mapbox token** to your deploy domain in [account.mapbox.com](https://account.mapbox.com/access-tokens/). Otherwise anyone can lift it from the bundle and burn your quota.
+- [ ] **Verify your Supabase anon key is "anon" only** — it's shipped in the browser bundle. The `service_role` key must never appear in client code or env vars prefixed with `VITE_`.
+- [ ] **Keep the photo bucket constraints** the schema sets up (2 MB cap, image MIME types only). If you re-create the bucket manually, re-apply those limits.
+- [ ] **Share the URL with your class only**, not on social media or public channels — there's no rate limit on submissions.
+- [ ] **Review the deployed CSP**. The `vercel.json` / `netlify.toml` ship a strict Content-Security-Policy that locks scripts/connections to Mapbox + Supabase. If you add a third-party (analytics, fonts, etc.), update the CSP allowlist or it will silently block.
+- [ ] **Names and photos are public** by design. Tell your classmates before they submit. Faces of minors → don't deploy this.
+- [ ] Want stronger guarantees? Add Supabase Auth (see [Adding auth](#adding-auth)) and consider adding [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) on the submit form to block bots.
+
 ---
 
 ## Quick start (~15 minutes)
@@ -173,7 +185,7 @@ defaultZoom: 4,
 
 **Replace the OG image** for nice social link previews: drop a 1200×630 PNG named `og-image.png` into `public/`, then update `index.html` to reference it.
 
-**Replace the favicon**: drop a new `favicon.svg` into `public/`.
+**Replace the favicon**: drop a new `favicon.svg` into `public/`. The default is a 📍 emoji rendered as SVG — fork-friendly and theme-neutral. Swap in your school's icon any time.
 
 ---
 
@@ -216,7 +228,7 @@ This is left as a fork-time exercise — every school's auth needs are different
 ```
 class-map/
 ├── public/
-│   ├── favicon.svg              # replace with your school's icon
+│   ├── favicon.svg              # default is a 📍 emoji; replace with your icon
 │   └── og-image.svg             # replace with your social preview
 ├── src/
 │   ├── config.ts                # ← edit this to brand the app

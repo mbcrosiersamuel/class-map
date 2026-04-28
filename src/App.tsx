@@ -20,7 +20,7 @@ export default function App() {
     typeof window !== 'undefined' ? tabFromHash(window.location.hash) : 'map',
   );
   const [mapHomeNonce, setMapHomeNonce] = useState(0);
-  const { people, loading, refetch } = usePeople();
+  const { people, loading, error, refetch } = usePeople();
 
   useEffect(() => {
     const onHashChange = () => setActiveTab(tabFromHash(window.location.hash));
@@ -47,6 +47,24 @@ export default function App() {
     <div className="h-full flex flex-col bg-surface">
       <Header onHomeClick={handleHomeClick} />
       <TabBar active={activeTab} onChange={handleTabChange} />
+
+      {error && (
+        <div
+          role="alert"
+          className="bg-red-50 border-b border-red-200 px-4 py-2 flex items-center justify-between gap-3"
+        >
+          <p className="text-sm text-red-800 font-sans">
+            Couldn't load classmates: {error}
+          </p>
+          <button
+            type="button"
+            onClick={refetch}
+            className="text-sm font-sans font-medium text-red-800 hover:underline flex-shrink-0"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       <main className="flex-1 overflow-hidden relative">
         {activeTab === 'map' && (

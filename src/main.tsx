@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
+import ErrorBoundary from './components/layout/ErrorBoundary';
 import { config } from './config';
 
 // Apply theme + metadata from config so a single edit to src/config.ts updates
@@ -28,6 +29,8 @@ setMetaContent('meta[name="twitter:description"]', description);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>,
 );

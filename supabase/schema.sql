@@ -49,9 +49,21 @@ create policy "public update" on public.people for update using (true);
 -- Intentionally no DELETE policy — public deletes are blocked.
 
 -- 4. Storage bucket for photos -----------------------------------------------
-insert into storage.buckets (id, name, public)
-values ('photos', 'photos', true)
-on conflict (id) do nothing;
+-- Bucket is public-read but constrained: 2 MB cap and image-only MIME types.
+-- These limits are enforced server-side by Supabase storage; the client also
+-- compresses and validates as defense in depth.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'photos',
+  'photos',
+  true,
+  2097152,
+  array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
+)
+on conflict (id) do update
+  set public = excluded.public,
+      file_size_limit = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "public read photos"   on storage.objects;
 drop policy if exists "public upload photos" on storage.objects;

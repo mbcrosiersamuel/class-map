@@ -4,24 +4,10 @@ import {
   UNCERTAINTY_ENABLED,
   UNCERTAINTY_LOCATION,
 } from '../../lib/constants';
+import { getInitials, formatCityCountry } from '../../lib/formatters';
 
 interface PersonRowProps {
   person: Person;
-}
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-}
-
-function formatOne(city: string, country: string): string {
-  if (!city && !country) return 'Unknown';
-  if (!city) return country;
-  if (!country) return city;
-  if (city === country) return city;
-  return `${city}, ${country}`;
 }
 
 export default function PersonRow({ person }: PersonRowProps) {
@@ -30,7 +16,7 @@ export default function PersonRow({ person }: PersonRowProps) {
   const label =
     person.locations.length === 0
       ? 'Unknown'
-      : person.locations.map((l) => formatOne(l.city, l.country)).join(' · ');
+      : person.locations.map((l) => formatCityCountry(l.city, l.country)).join(' · ');
   const showGroup = GROUPING_ENABLED && person.group_value;
 
   return (
@@ -45,6 +31,8 @@ export default function PersonRow({ person }: PersonRowProps) {
           <img
             src={person.photo_url}
             alt={person.name}
+            width={40}
+            height={40}
             className="h-10 w-10 rounded-full border border-gray-200 object-cover"
             loading="lazy"
             crossOrigin="anonymous"

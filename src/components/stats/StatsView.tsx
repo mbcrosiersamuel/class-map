@@ -9,6 +9,7 @@ import {
   UNCERTAINTY_LOCATION,
 } from '../../lib/constants';
 import Dropdown from '../ui/Dropdown';
+import { getCityCountryKey, formatCityCountry } from '../../lib/formatters';
 
 interface StatsViewProps {
   people: Person[];
@@ -28,9 +29,8 @@ export default function StatsView({ people }: StatsViewProps) {
     for (const p of people) {
       if (cityGroupFilter !== '' && p.group_value !== cityGroupFilter) continue;
       for (const loc of p.locations) {
-        const key = `${loc.city.toLowerCase()}|${loc.country.toLowerCase()}`;
-        const label =
-          loc.country && loc.country !== loc.city ? `${loc.city}, ${loc.country}` : loc.city;
+        const key = getCityCountryKey(loc.city, loc.country);
+        const label = formatCityCountry(loc.city, loc.country);
         const existing = groups.get(key);
         if (existing) existing.count += 1;
         else groups.set(key, { key, label, count: 1 });

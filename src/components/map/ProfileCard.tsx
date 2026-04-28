@@ -51,6 +51,8 @@ export default function ProfileCard({ person, clusterCity, clusterCountry, style
         <img
           src={person.photo_url}
           alt={person.name}
+          width={112}
+          height={144}
           className="w-full h-full object-cover"
           loading="lazy"
         />

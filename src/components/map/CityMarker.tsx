@@ -11,10 +11,10 @@ export default function CityMarker({ count, onClick }: CityMarkerProps) {
   let textClass: string;
 
   if (count <= 3) {
-    sizeClass = 'w-8 h-8';
+    sizeClass = 'w-10 h-10';
     textClass = 'text-xs';
   } else if (count <= 10) {
-    sizeClass = 'w-10 h-10';
+    sizeClass = 'w-11 h-11';
     textClass = 'text-sm';
   } else {
     sizeClass = 'w-12 h-12';

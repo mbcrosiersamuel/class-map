@@ -5,6 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { type Person, type GroupValue, type CityCluster } from '../../types';
 import { DEFAULT_CENTER, DEFAULT_ZOOM, GROUPING_ENABLED, BACKGROUND_COLOR } from '../../lib/constants';
+import { getCityCountryKey } from '../../lib/formatters';
 import GroupFilter from './GroupFilter';
 import MapSearchBar from './MapSearchBar';
 import CityMarker from './CityMarker';
@@ -26,7 +27,7 @@ function clusterPeople(people: Person[]): CityCluster[] {
   for (const person of people) {
     for (const loc of person.locations) {
       if (!isValidCoord(loc.latitude, loc.longitude)) continue;
-      const key = `${loc.city.toLowerCase()}|${loc.country.toLowerCase()}`;
+      const key = getCityCountryKey(loc.city, loc.country);
       if (groups.has(key)) {
         groups.get(key)!.people.push(person);
       } else {
@@ -148,6 +149,21 @@ export default function MapView({ people, homeNonce }: MapViewProps) {
           {GROUPING_ENABLED && <GroupFilter value={groupFilter} onChange={setGroupFilter} />}
         </div>
       </div>
+
+      {clusters.length === 0 && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-24 md:bottom-12 flex justify-center px-4">
+          <div className="pointer-events-auto bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 px-5 py-4 max-w-sm text-center">
+            <p className="font-display text-base text-gray-900 mb-1">
+              No pins yet
+            </p>
+            <p className="text-sm text-gray-500 font-sans">
+              {groupFilter
+                ? 'No one in this group has dropped a pin yet.'
+                : 'Be the first to drop a pin — head to the Submit tab.'}
+            </p>
+          </div>
+        </div>
+      )}
 
       <ProfileFanOut cluster={selectedCluster} onClose={handleCloseFanOut} />
     </div>
