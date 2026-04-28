@@ -27,19 +27,7 @@ A self-serve map for any school or class to drop pins of where everyone's headed
 
 **Anyone with the link can add, edit, or move *any* entry — including yours.** Anyone can also re-upload a photo for anyone. There is no login.
 
-This is intentional and works fine for a small trusted class group, but **do not deploy this publicly without thinking about it**. If you want real auth, you'll need to wire up Supabase Auth and adjust the RLS policies in `supabase/schema.sql` — see [Adding auth](#adding-auth) below for pointers.
-
-### Security checklist before going live
-
-The defaults are reasonable for a small trusted group, but harden these before sharing the URL widely:
-
-- [ ] **Restrict your Mapbox token** to your deploy domain in [account.mapbox.com](https://account.mapbox.com/access-tokens/). Otherwise anyone can lift it from the bundle and burn your quota.
-- [ ] **Verify your Supabase anon key is "anon" only** — it's shipped in the browser bundle. The `service_role` key must never appear in client code or env vars prefixed with `VITE_`.
-- [ ] **Keep the photo bucket constraints** the schema sets up (2 MB cap, image MIME types only). If you re-create the bucket manually, re-apply those limits.
-- [ ] **Share the URL with your class only**, not on social media or public channels — there's no rate limit on submissions.
-- [ ] **Review the deployed CSP**. The `vercel.json` / `netlify.toml` ship a strict Content-Security-Policy that locks scripts/connections to Mapbox + Supabase. If you add a third-party (analytics, fonts, etc.), update the CSP allowlist or it will silently block.
-- [ ] **Names and photos are public** by design. Tell your classmates before they submit. Faces of minors → don't deploy this.
-- [ ] Want stronger guarantees? Add Supabase Auth (see [Adding auth](#adding-auth)) and consider adding [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) on the submit form to block bots.
+It works fine for a small trusted class group — just be aware that anyone's pin can be changed by someone whose identity hasn't been verified.
 
 ---
 
@@ -202,24 +190,6 @@ Build for production:
 npm run build
 npm run preview                  # preview the dist build locally
 ```
-
----
-
-## Adding auth
-
-Out of the box, anyone with the link can edit any entry. To add real authentication:
-
-1. Enable an auth provider in **Authentication → Providers** in your Supabase dashboard (email magic link is easiest).
-2. Tighten the RLS policies in `supabase/schema.sql`. The current policies use `using (true)` and `with check (true)`. Replace with checks against `auth.uid()`, e.g.:
-   ```sql
-   create policy "users can update their own row"
-     on public.people for update
-     using (auth.uid() = owner_id);
-   ```
-   You'll need to add an `owner_id uuid references auth.users(id)` column to the `people` table.
-3. Add a sign-in screen to the React app. The Supabase client is already wired up in `src/lib/supabase.ts`.
-
-This is left as a fork-time exercise — every school's auth needs are different.
 
 ---
 
